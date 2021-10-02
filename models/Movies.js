@@ -1,23 +1,40 @@
 const mongoose = require("mongoose");
 
-const MovieSchema = mongoose.Schema({
+const MovieSchema = new mongoose.Schema({
   movie_title: {
     type: String,
     required: false
   },
   actor_one: {
-    type: String,
-    required: false
+    name: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String,
+      required: false,
+    }
   },
   actor_two: {
-    type: String,
-    required: true
+    name: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String,
+      required: false,
+    }
   },
   actor_three: {
-    type: String,
-    required: true
+    name: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String,
+      required: false,
+    }
   },
-
   createdAt: {
     type: Date,
     default: Date.now()

@@ -1,25 +1,21 @@
 import styles from '../styles/Home.module.css'
-import React from 'react'
-
-var axios = require("axios").default;
-// require('dotenv').config()
-
-
-const API_KEY = process.env.REACT_APP_GOOGLEAPI_KEY
-const cx = process.env.REACT_APP_GOOGLE_CX
+import React, {useEffect} from 'react'
+import {useRouter} from 'next/router'
 
 const listActors = (all_actors, image_urls) => {
   console.log(image_urls);
   if (all_actors === null) { 
     return <div className="actor_block"><h4> Actor 1</h4> <h4> Actor 2</h4> <h4>Actor 3</h4></div>
   }
-  if (all_actors === undefined ) {
-    return <h3> Couldn't find that title </h3>
-    // return <div id="actor-block"><h4> Actor 1</h4> <h4> Actor 2</h4> <h4>Actor 3</h4></div>
+  if (all_actors[0] === undefined) {
+    return
   }
-  const actorList = all_actors.map((actor,actorIdx) => <h4 key={actorIdx}> {actor.name} </h4>)
+  if (all_actors[0] === undefined ) {
+    return <h3> Couldn't find that title </h3>
+  }
+  const actorList = all_actors.map((actor,actorIdx) => <h4 key={actorIdx}> {actor} </h4>)
   const images = image_urls.map((url) => {
-    return <img src={url} width='150px' height='200px' alt="toddford"></img>
+    return <img src={url} width='150px' height='200px' alt="actor"></img>
   })
   
   console.log(actorList);
@@ -31,89 +27,59 @@ const listActors = (all_actors, image_urls) => {
       <div className={styles.image_block}>
         {images}
       </div>
-      
     </div>
   );
 }
 
-function App(env_variables) {
-  const [post,setPost] = React.useState(null);
+function App(app_data) {
+  const [actors,setActors] = React.useState([]);
   const [movie, updateMovie] = React.useState(null);
-  const [imageSrc, setImageSrc] = React.useState([]);
+  const [images, setImages] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
+  const router = useRouter();
   
-  const API_KEY = env_variables['GOOGLEAPI_KEY']
-  const cx = env_variables['cx']
-  const IMDBAPI_KEY = env_variables['IMDBAPI_KEY']
-  // console.log('google: ', API_KEY)
-  // console.log('cx: ', cx)
-  // console.log('IMDB: ', IMDBAPI_KEY)
+  useEffect(() => {
+    setActors([app_data.data.actor_one, app_data.data.actor_two, app_data.data.actor_three])
+    setImages([app_data.data.actor_one_img, app_data.data.actor_two_img, app_data.data.actor_three_img])
+    if (movie) {
+      router.push('/' + movie, undefined, {shallow: true});
+    }    
+  }, [])
 
-  const fetchImageData = async (actors) => {
-    if (actors === null || actors === 'undefined') {
-      console.log("didn't get actors");
-      return;
-    }
-    let new_imageSrc = []
-    for (const actor of actors) {
-      console.log("calling google api...")
-      const response = await axios.request(`https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=${cx}&q=${actor.name}`)
-      const url = response.data.items[0].pagemap.cse_image[0].src
-      new_imageSrc.push(url)
-    }
-    setIsLoading(false);
-    console.log(new_imageSrc);
-    setImageSrc(new_imageSrc);     
-  }
+  console.log('actors: ', actors)
+  console.log('images: ', images)
+
   
-  var options = {
-    method: 'GET',
-    url: 'https://imdb8.p.rapidapi.com/title/find',
-    params: {q: movie},
-    headers: {
-      'x-rapidapi-host': 'imdb8.p.rapidapi.com',
-      'x-rapidapi-key': IMDBAPI_KEY 
-    }
-  };
-
   const changeMovie = (new_movie) => {
-    console.log(new_movie);
-    updateMovie(new_movie);
+    updateMovie(new_movie.toLowerCase());
   }
-
-  async function getPost() {
-    setIsLoading(true);
-    const response  = await axios.request(options)
-    console.log(response.data.results[0])
-    let principals = response.data.results[0].principals
-    fetchImageData(principals)
-    setPost(principals);    
-    };
   
   return (
     <div className={styles.App}>  
-      {post !== null && imageSrc.length !== 0 && listActors(post, imageSrc)}
+      {actors !== null && images.length !== 0 && listActors(actors, images)}
       <br></br>
       <div className={styles.input_section}>
         <div className={styles.prompt_block}>
-          <label className={styles.prompt}> Enter a movie to display the lead actors </label> 
+          <label className={styles.prompt}> Enter a movie and hit enter to display the lead actors </label> 
         </div>
       
       <br></br>
         <h2 className={styles.loading}> {isLoading && "Loading..."} </h2>
          <div className={styles.input_block}>
-          <input className={styles.input} type="text" onChange={e => changeMovie(e.target.value)}/>
-          <button className={styles.button} onClick={() => getPost()} > <strong>Find Stars </strong></button> 
+          <form action='movies/search' method='POST'>
+            <input className={styles.input} type="text" onChange={e => changeMovie(e.target.value)} name='movie'/>
+          </form> 
+          {/* <button className={styles.button} disabled='true' onClick={() => getPost()} > <strong>Find Stars </strong></button>  */}
          </div>  
        </div>      
      </div>
   );
 }
-App.getInitialProps = async (ctx) => {
-  const env_variables = { GOOGLEAPI_KEY: process.env.REACT_APP_GOOGLEAPI_KEY, 
-                          cx: process.env.REACT_APP_GOOGLE_CX,
-                          IMDBAPI_KEY: process.env.REACT_APP_IMDBAPI_KEY}
-    
-  return env_variables
+export async  function getServerSideProps(context) {
+  return {
+    props: {
+      data: context.query
+    }
+  }
 }
 export default App;

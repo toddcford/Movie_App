@@ -1,5 +1,5 @@
 const express = require('express');
-// const user2 = require('./routes/user2')
+const movies = require('./routes/movies')
 const InitiateMongoServer = require('./db')
 const next = require('next');
 require('dotenv').config()
@@ -19,7 +19,7 @@ app.prepare().then(() => {
   server.use(express.json());    
   server.use(express.urlencoded());
 
-
+  server.use('/movies', movies);  
   server.get('*', (req, res) => handle(req, res));
 
   // starting express server
