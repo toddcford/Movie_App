@@ -9,11 +9,11 @@ const cx = process.env.REACT_APP_GOOGLE_CX
 const API_KEY = process.env.REACT_APP_GOOGLEAPI_KEY
 
 router.post('/search', async (req, res) => {
-  let movie_title = req.body.movie;
+  let movie_title = req.body.movie.toLowerCase();
   var options = {
     method: 'GET',
     url: 'https://imdb8.p.rapidapi.com/title/find',
-    params: {q: req.body.movie},
+    params: {q: req.body.movie.toLowerCase()},
     headers: {
       'x-rapidapi-host': 'imdb8.p.rapidapi.com',
       'x-rapidapi-key': IMDBAPI_KEY 
