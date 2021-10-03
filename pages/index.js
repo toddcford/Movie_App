@@ -41,15 +41,25 @@ function App(app_data) {
   useEffect(() => {
     setActors([app_data.data.actor_one, app_data.data.actor_two, app_data.data.actor_three])
     setImages([app_data.data.actor_one_img, app_data.data.actor_two_img, app_data.data.actor_three_img])
+    localStorage.setItem(app_data.data.name, JSON.stringify(app_data.data));
     if (movie) {
       router.push('/' + movie, undefined, {shallow: true});
     }    
   }, [])
 
-  console.log('actors: ', actors)
-  console.log('images: ', images)
-
-  
+  const checkMovie = (e) => {
+    
+    if (localStorage.getItem(movie) === null) {
+      console.log('no movie in cache')
+    } else {
+      e.preventDefault();
+      const cached_data = JSON.parse(localStorage.getItem(movie));
+      const cached_actors = [cached_data.actor_one, cached_data.actor_two, cached_data.actor_three]
+      const cached_images = [cached_data.actor_one_img, cached_data.actor_two_img, cached_data.actor_three_img]
+      setActors(cached_actors)
+      setImages(cached_images)      
+    }
+  }
   const changeMovie = (new_movie) => {
     updateMovie(new_movie.toLowerCase());
   }
@@ -66,10 +76,9 @@ function App(app_data) {
       <br></br>
         <h2 className={styles.loading}> {isLoading && "Loading..."} </h2>
          <div className={styles.input_block}>
-          <form action='movies/search' method='POST'>
-            <input className={styles.input} type="text" onChange={e => changeMovie(e.target.value)} name='movie'/>
+          <form action='movies/search' method='POST' onSubmit={(e)=> checkMovie(e)}>
+            <input className={styles.input} type="text" onChange={e => changeMovie(e.target.value)} name='movie'/>  
           </form> 
-          {/* <button className={styles.button} disabled='true' onClick={() => getPost()} > <strong>Find Stars </strong></button>  */}
          </div>  
        </div>      
      </div>
@@ -83,3 +92,4 @@ export async  function getServerSideProps(context) {
   }
 }
 export default App;
+
