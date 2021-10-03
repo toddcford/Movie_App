@@ -4,18 +4,18 @@ import {useRouter} from 'next/router'
 
 const listActors = (all_actors, image_urls) => {
   console.log(image_urls);
-  if (all_actors === null) { 
+  if (all_actors === null) {  
     return <div className="actor_block"><h4> Actor 1</h4> <h4> Actor 2</h4> <h4>Actor 3</h4></div>
   }
   if (all_actors[0] === undefined) {
     return
   }
   if (all_actors[0] === undefined ) {
-    return <h3> Couldn't find that title </h3>
+    return <h3> Couldn not find that title </h3>
   }
   const actorList = all_actors.map((actor,actorIdx) => <h4 key={actorIdx}> {actor} </h4>)
-  const images = image_urls.map((url) => {
-    return <img src={url} width='150px' height='200px' alt="actor"></img>
+  const images = image_urls.map((url, urlIdx) => {
+    return <img src={url} key={urlIdx} width='150px' height='200px' alt="actor"></img>
   })
   
   console.log(actorList);
