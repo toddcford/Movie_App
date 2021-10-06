@@ -76,7 +76,7 @@ function App(app_data) {
       <br></br>
         <h2 className={styles.loading}> {isLoading && "Loading..."} </h2>
          <div className={styles.input_block}>
-          <form action='movies/search' method='POST' onSubmit={(e)=> checkMovie(e)}>
+          <form action='movies/search' method='POST' onSubmit={(e)=> checkMovie(e)} autoComplete='off'>
             <input className={styles.input} type="text" onChange={e => changeMovie(e.target.value)} name='movie'/>  
           </form> 
          </div>  
